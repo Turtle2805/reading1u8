@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive English Test - Ms Lê Hằng English</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8854C0;
+            --secondary: #FDCB6E;
+            --accent: #00C9A7;
+            --correct: #00D26A;
+            --wrong: #FF4757;
+            --bg-gradient: linear-gradient(-45deg, #8854C0, #E0C3FC, #00C9A7, #FDCB6E);
+            --text-color: #2D3436;
+            --card-bg: rgba(255, 255, 255, 0.93);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Họa tiết SVG bay lơ lửng trên nền */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.15;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><text y='30' font-size='24'>✨</text><text x='50' y='70' font-size='28'>🎨</text><text x='10' y='80' font-size='22'>📚</text><text x='70' y='25' font-size='26'>⭐</text></svg>");
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        .teacher-info h3 {
+            font-size: 0.95rem;
+            color: var(--primary);
+            font-weight: 900;
+        }
+        .teacher-info h4 {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .timer-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .timer-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #6c3da3;
+            transition: all 0.1s;
+        }
+        .timer-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0 #6c3da3;
+        }
+
+        #timer-display {
+            font-size: 1.2rem;
+            font-weight: 900;
+            background: #fff;
+            padding: 5px 12px;
+            border-radius: 10px;
+            border: 2px solid var(--primary);
+            min-width: 70px;
+            text-align: center;
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        .split-pane {
+            width: 50%;
+            overflow-y: auto;
+            padding: 25px;
+            height: calc(100vh - 65px);
+        }
+
+        .left-pane {
+            border-right: 4px dashed rgba(136, 84, 192, 0.2);
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .right-pane {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Decorating Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+            border: 3px solid #fff;
+            position: relative;
+        }
+
+        .card-title {
+            color: var(--primary);
+            font-weight: 900;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            border-bottom: 3px solid var(--secondary);
+            padding-bottom: 5px;
+            display: inline-block;
+        }
+
+        .passage-text {
+            line-height: 1.7;
+            font-size: 1.05rem;
+            margin-bottom: 15px;
+            white-space: pre-line;
+        }
+
+        .translation-box {
+            display: none;
+            background: #f1f2f6;
+            border-left: 5px solid var(--accent);
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 10px;
+            font-size: 0.95rem;
+            color: #57606f;
+            font-style: italic;
+        }
+
+        .toggle-trans-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.85rem;
+            box-shadow: 0 3px 0 #00a387;
+        }
+        .toggle-trans-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 0 0;
+        }
+
+        /* Vocabulary Table */
+        .vocab-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            font-size: 0.9rem;
+        }
+        .vocab-table th, .vocab-table td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .vocab-table th {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Question Elements */
+        .question-box {
+            background: white;
+            border-radius: 18px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 3px solid #f0f0f0;
+        }
+
+        .question-text {
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin-bottom: 12px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .option-btn {
+            background: #fff;
+            border: 3px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s;
+            box-shadow: 0 4px 0 #e0e0e0;
+        }
+
+        .option-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .option-btn.correct {
+            background-color: var(--correct) !important;
+            color: white !important;
+            border-color: #00b359 !important;
+            box-shadow: 0 4px 0 #00b359 !important;
+        }
+
+        .option-btn.wrong {
+            background-color: var(--wrong) !important;
+            color: white !important;
+            border-color: #e63946 !important;
+            box-shadow: 0 4px 0 #e63946 !important;
+            animation: shake 0.4s ease;
+        }
+
+        /* In-line Interactive Blank */
+        .inline-blank {
+            display: inline-block;
+            min-width: 80px;
+            border-bottom: 3px dashed var(--primary);
+            text-align: center;
+            color: var(--primary);
+            font-weight: 900;
+            cursor: pointer;
+            background: #fff3cd;
+            padding: 0 5px;
+            border-radius: 5px;
+        }
+
+        /* Explanation Box */
+        .explanation {
+            display: none;
+            margin-top: 12px;
+            padding: 12px;
+            background: #edf2f7;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            border-left: 5px solid var(--primary);
+            line-height: 1.5;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
+        /* Footer Submit Bar */
+        .submit-container {
+            padding: 15px 25px;
+            background: white;
+            text-align: center;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+
+        .btn-submit-all {
+            background: linear-gradient(135deg, #00C9A7, #00D26A);
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 900;
+            padding: 12px 50px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #00997e;
+            transition: all 0.1s;
+        }
+        .btn-submit-all:active {
+            transform: translateY(6px);
+            box-shadow: 0 0px 0 #00997e;
+        }
+
+        /* Modal Score Overlay */
+        .modal {
+            display: flex;
+            position: fixed;
+            top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal.active {
+            opacity: 1; pointer-events: auto;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 5px solid var(--secondary);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+        .score-num {
+            font-size: 4rem;
+            font-weight: 900;
+            color: var(--primary);
+            margin: 15px 0;
+        }
+        .feedback-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #2d3436;
+        }
+        .close-modal-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Confetti Canvas */
+        #confetti-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 99;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="teacher-info">
+            <h3>Ms Lê Hằng English ✨</h3>
+            <h4>Interactive English Practice Test</h4>
+        </div>
+        <div class="timer-container">
+            <button class="timer-btn" id="timer-toggle-btn" onclick="toggleTimer()">BẮT ĐẦU TÍNH GIỜ LÀM BÀI</button>
+            <div id="timer-display">10:00</div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- BÊN TRÁI: READING PASSAGES & SIGN BOARDS -->
+        <div class="split-pane left-pane">
+            
+            <!-- EXERCISE 15 GRAPHICS / SIGNS -->
+            <div class="card" style="background-image: radial-gradient(circle, #fff, #f5f6fa);">
+                <div class="card-title">Exercise 15: Notice & Signs Material</div>
+                <p style="font-style: italic; color: #555; margin-bottom: 10px;">Các bé hãy đọc nội dung văn bản giả lập của biển báo dưới đây tương ứng với các câu hỏi bên phải nhé!</p>
+                
+                <div style="border: 2px dashed #ccc; padding: 10px; margin-bottom: 10px; border-radius: 10px;">
+                    <strong>Sign 1:</strong> [⚠️ DANGEROUS QUAYSIDE / RIVERBANK AHEAD]
+                </div>
+                <div style="border: 2px dashed #ccc; padding: 10px; margin-bottom: 10px; border-radius: 10px;">
+                    <strong>Notice 2:</strong> [🚼 FRONT SEATS RESERVED ONLY FOR CHILDREN]
+                </div>
+                <div style="border: 2px dashed #ccc; padding: 10px; margin-bottom: 10px; border-radius: 10px;">
+                    <strong>Sign 3:</strong> [🎫 SCHOOL TRIP NOTICE: FRIDAY TRIP TICKETS COMPLETELY SOLD OUT!]
+                </div>
+                <div style="border: 2px dashed #ccc; padding: 10px; margin-bottom: 10px; border-radius: 10px;">
+                    <strong>Notice 4:</strong> [🐾 ATTENTION PET OWNERS: PLEASE CLEAN UP ANY WASTE YOUR PET LEAVES BEHIND]
+                </div>
+                <div style="border: 2px dashed #ccc; padding: 10px; margin-bottom: 10px; border-radius: 10px;">
+                    <strong>Sign 5:</strong> [🚌 BUS BOARDING RULE: TICKETS MUST BE BOUGHT BEFORE BOARDING THE BUS]
+                </div>
+            </div>
+
+            <!-- EXERCISE 16 - PASSAGE 1 -->
+            <div class="card">
+                <div class="card-title">Exercise 16 - Text ❶</div>
+                <div class="passage-text" id="ex16-p1">
+                    Let's Build a Model!
+                    Do you like (1)<span class="inline-blank" onclick="revealBlank(this, 'making')">.....</span> things with your hands? Join our Model-Making Workshop! You will learn to make simple models like cars, houses, or robots using paper, plastic, and glue. It’s easy and fun! You don’t need (2)<span class="inline-blank" onclick="revealBlank(this, 'any')">.....</span> experience. We will help you step by step. Bring your ideas and (3)<span class="inline-blank" onclick="revealBlank(this, 'creativity')">.....</span>. Make new friends and build something amazing together. (4)<span class="inline-blank" onclick="revealBlank(this, 'At')">.....</span> the end, you can take your model home and show it to your family.
+                    📅 Every Saturday
+                    🕒 2 PM – 4 PM
+                    📍 City Youth Center
+                    Come and create something cool!
+                </div>
+                <button class="toggle-trans-btn" onclick="toggleTranslation(this)">Mở dịch đoạn này 🌟</button>
+                <div class="translation-box">
+                    Hãy cùng làm mô hình nào! Bạn có thích tự tay làm đồ vật không? Hãy tham gia Hội thảo Làm Mô hình của chúng tôi! Bạn sẽ học cách làm các mô hình đơn giản như ô tô, nhà ở hoặc rô-bốt bằng giấy, nhựa và keo dán. Nó rất dễ dàng và vui nhộn! Bạn không cần bất kỳ kinh nghiệm nào. Chúng tôi sẽ giúp bạn từng bước một. Hãy mang theo ý tưởng và sự sáng tạo của bạn. Kết giao bạn mới và cùng nhau xây dựng điều gì đó tuyệt vời. Đến cuối buổi, bạn có thể mang mô hình của mình về nhà và khoe với gia đình.
+                    📅 Mỗi thứ Bảy | 🕒 2 giờ chiều – 4 giờ chiều | 📍 Trung tâm Thanh thiếu niên Thành phố. Hãy đến và tạo ra điều gì đó thật ngầu!
+                </div>
+                
+                <table class="vocab-table">
+                    <thead><tr><th>Từ vựng</th><th>Loại từ</th><th>Nghĩa tiếng Việt</th></tr></thead>
+                    <tbody>
+                        <tr><td>Workshop</td><td>n</td><td>Hội thảo, buổi thực hành</td></tr>
+                        <tr><td>Experience</td><td>n</td><td>Kinh nghiệm, trải nghiệm</td></tr>
+                        <tr><td>Creativity</td><td>n</td><td>Sự sáng tạo</td></tr>
+                        <tr><td>Amazing</td><td>adj</td><td>Kinh ngạc, tuyệt vời</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- EXERCISE 16 - PASSAGE 2 -->
+            <div class="card">
+                <div class="card-title">Exercise 16 - Text ❷</div>
+                <div class="passage-text">
+                    Let's Talk About Leisure Time!
+                    Do you like watching movies, playing sports, or reading books? Everyone needs time to relax and enjoy life. Leisure time is important (1)<span class="inline-blank" onclick="revealBlank(this, 'because')">.....</span> it helps us rest and feel happy. After work or school, you can go (2)<span class="inline-blank" onclick="revealBlank(this, 'for')">.....</span> a walk, listen to music, or meet friends. These activities help your body and mind stay (3)<span class="inline-blank" onclick="revealBlank(this, 'healthy')">.....</span>. You don’t need much money—just a little free time and a fun idea. What do you like to do in your free time? Share your (4)<span class="inline-blank" onclick="revealBlank(this, 'hobbies')">.....</span> with us and let’s enjoy our leisure time together!
+                </div>
+                <button class="toggle-trans-btn" onclick="toggleTranslation(this)">Mở dịch đoạn này 🌟</button>
+                <div class="translation-box">
+                    Hãy cùng nói về thời gian rảnh rỗi nhé! Bạn có thích xem phim, chơi thể thao hay đọc sách không? Ai cũng cần thời gian để thư giãn và tận hưởng cuộc sống. Thời gian rảnh rỗi rất quan trọng vì nó giúp chúng ta nghỉ ngơi và cảm thấy hạnh phúc. Sau giờ làm việc hoặc giờ học, bạn có thể đi dạo, nghe nhạc hoặc gặp gỡ bạn bè. Những hoạt động này giúp cơ thể và tâm trí của bạn luôn khỏe mạnh. Bạn không cần nhiều tiền — chỉ cần một chút thời gian rảnh và một ý tưởng vui vẻ. Bạn thích làm gì vào thời gian rảnh rỗi? Hãy chia sẻ sở thích của bạn với chúng tôi và cùng nhau tận hưởng thời gian rảnh rỗi nhé!
+                </div>
+                
+                <table class="vocab-table">
+                    <thead><tr><th>Từ vựng</th><th>Loại từ</th><th>Nghĩa tiếng Việt</th></tr></thead>
+                    <tbody>
+                        <tr><td>Leisure time</td><td>n</td><td>Thời gian rảnh rỗi, giải trí</td></tr>
+                        <tr><td>Relax</td><td>v</td><td>Thư giãn</td></tr>
+                        <tr><td>Healthy</td><td>adj</td><td>Khỏe mạnh, lành mạnh</td></tr>
+                        <tr><td>Mind</td><td>n</td><td>Tâm trí, tinh thần</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- EXERCISE 17 - PASSAGE 1 -->
+            <div class="card">
+                <div class="card-title">Exercise 17 - Text ❶</div>
+                <div class="passage-text">
+                    Reading books is one of the (1)_______ hobbies that I know. I like (2)_______ books because it brings me many benefits. Books provide me (3)_______ so much information and facts. Reading books is also a way for me (4)_______ in my free time. I can learn a lot of good things from books. Moreover, I can improve my knowledge and skills (5)_______ I haven't known before. In addition, I learn how to live and behave (6)_______ with others. In conclusion, reading books is a habit that everyone should have.
+                </div>
+                <button class="toggle-trans-btn" onclick="toggleTranslation(this)">Mở dịch đoạn này 🌟</button>
+                <div class="translation-box">
+                    Đọc sách là một trong những sở thích tốt nhất mà tôi biết. Tôi thích đọc sách vì nó mang lại cho tôi nhiều lợi ích. Sách cung cấp cho tôi rất nhiều thông tin và sự thật. Đọc sách cũng là một cách để tôi thư giãn khi rảnh rỗi. Tôi có thể học được nhiều điều tốt đẹp từ sách. Hơn nữa, tôi có thể nâng cao kiến ​​thức và kỹ năng mà trước đây mình chưa biết. Ngoài ra, tôi học được cách sống và cư xử tốt với người khác. Tóm lại, đọc sách là một thói quen mà ai cũng nên có.
+                </div>
+                
+                <table class="vocab-table">
+                    <thead><tr><th>Từ vựng</th><th>Loại từ</th><th>Nghĩa tiếng Việt</th></tr></thead>
+                    <tbody>
+                        <tr><td>Benefit</td><td>n</td><td>Lợi ích</td></tr>
+                        <tr><td>Provide</td><td>v</td><td>Cung cấp</td></tr>
+                        <tr><td>Improve</td><td>v</td><td>Cải thiện, nâng cao</td></tr>
+                        <tr><td>Knowledge</td><td>n</td><td>Kiến thức</td></tr>
+                        <tr><td>Behave</td><td>v</td><td>Cư xử, đối xử</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- EXERCISE 17 - PASSAGE 2 -->
+            <div class="card">
+                <div class="card-title">Exercise 17 - Text ❷</div>
+                <div class="passage-text">
+                    Quang is watering his garden and can't wait to pick the ripe fruit. He (1)________ most of his spare time looking after the garden. Sounds great, doesn't it? But his garden is a (2)________ one!
+                    In today's world, teenagers rely on technology more than in the past. This can be a problem because using computers too much may have harmful effects (3)_______ both their minds and bodies. They prefer (4)_______ TV and playing computer games to reading books, perhaps because they don't have to think and imagine as much. They don't join clubs or have hobbies and they don't play sports. They sit in front of the computer all the time. They don't get out of the house, even for a walk. They are in a world that doesn't exist.
+                    While Quang now knows the names of (5)_______ plants and his English seems to be improving as he chats with his "gaming friends" from all over the world, his parents are getting (6)________. They want him to get out more. They are even thinking of banning him from using the computer.
+                </div>
+                <button class="toggle-trans-btn" onclick="toggleTranslation(this)">Mở dịch đoạn này 🌟</button>
+                <div class="translation-box">
+                    Quang đang tưới vườn và nóng lòng muốn hái quả chín. Cậu dành phần lớn thời gian rảnh rỗi của mình để chăm sóc khu vườn. Nghe thật tuyệt phải không? Nhưng khu vườn của cậu ấy lại là một khu vườn ảo!
+                    Trong thế giới ngày nay, thanh thiếu niên phụ thuộc vào công nghệ nhiều hơn trước đây. Đây có thể là một vấn đề vì sử dụng máy tính quá nhiều có thể gây hại cho cả tinh thần và thể chất của các em. Các em thích xem TV và chơi trò chơi điện tử hơn là đọc sách, có lẽ vì các em không phải suy nghĩ và tưởng tượng nhiều. Các em không tham gia câu lạc bộ hay có sở thích nào và cũng không chơi thể thao. Các em ngồi trước máy tính suốt ngày. Các em không ra khỏi nhà, ngay cả đi dạo. Các em đang ở trong một thế giới không có thật.
+                    Mặc dù bây giờ Quang đã biết tên của một vài loại cây và vốn tiếng Anh của cậu dường như đang tiến bộ hơn khi trò chuyện với những "bạn game" từ khắp nơi trên thế giới, bố mẹ cậu lại đang lo lắng. Họ muốn cậu ra ngoài nhiều hơn. Họ thậm chí còn nghĩ đến việc cấm cậu sử dụng máy tính.
+                </div>
+                
+                <table class="vocab-table">
+                    <thead><tr><th>Từ vựng</th><th>Loại từ</th><th>Nghĩa tiếng Việt</th></tr></thead>
+                    <tbody>
+                        <tr><td>Virtual</td><td>adj</td><td>Ảo (không có thật)</td></tr>
+                        <tr><td>Rely on</td><td>v</td><td>Phụ thuộc vào, dựa vào</td></tr>
+                        <tr><td>Harmful</td><td>adj</td><td>Có hại</td></tr>
+                        <tr><td>Imagine</td><td>v</td><td>Tưởng tượng</td></tr>
+                        <tr><td>Ban</td><td>v</td><td>Cấm đoán</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- EXERCISE 17 - PASSAGE 3 -->
+            <div class="card">
+                <div class="card-title">Exercise 17 - Text ❸</div>
+                <div class="passage-text">
+                    The British spend their free time in different ways. People generally use it to relax, but many people also do (1)_______ work, especially for charities.
+                    A lot of free time is (2)_____ in the home, where the most popular leisure activity is watching television, the average viewing time being 25 hours a week. People often record programmes so that they can watch them later.
+                    Reading is also a favorite way of spending leisure time. The British spend a lot of time reading newspapers and magazines.
+                    In the summer, gardening is (3)______, and in winter it is often replaced by "do-it- yourself", when people spend time improving or repairing their homes. Many people have pets to (4)______. Taking the dog for a walk is a regular routine.
+                    The extra time available at weekends means that some leisure activities, many of them to do with sport, normally take place only then. Traditional spectator sports include football, cricket, horse racing, motor racing and motor cycle racing. Popular forms of (5)____ are swimming, tennis, ice-skating or roller-skating, cycling, climbing, and hill or country walking.
+                    Families often have a "day out" at the weekend, especially in summer, with a visit to a local event such as a festival, fair or show. Young people especially go to clubs and discos, (6)______ people of all ages go to the theatre, the cinema, art exhibitions and concerts.
+                </div>
+                <button class="toggle-trans-btn" onclick="toggleTranslation(this)">Mở dịch đoạn này 🌟</button>
+                <div class="translation-box">
+                    Người Anh dành thời gian rảnh rỗi của họ theo những cách khác nhau. Mọi người thường sử dụng nó để thư giãn, nhưng nhiều người cũng làm công việc tình nguyện, đặc biệt là cho các tổ chức từ thiện. Nhiều thời gian rảnh được dành ở nhà, nơi hoạt động giải trí phổ biến nhất là xem truyền hình với thời gian xem trung bình là 25 giờ một tuần... Vào mùa hè, làm vườn rất phổ biến, và vào mùa đông, nó thường được thay thế bằng công việc "tự làm (DIY)", khi mọi người dành thời gian cải tạo hoặc sửa chữa ngôi nhà của họ... Cuối tuần các gia đình thường có một "ngày đi chơi", đặc biệt là vào mùa hè, với một chuyến đi đến một sự kiện địa phương như lễ hội, hội chợ hoặc buổi triển lãm...
+                </div>
+            </div>
+
+            <!-- EXERCISE 19 - PASSAGE 1 -->
+            <div class="card">
+                <div class="card-title">Exercise 19 - Text ❶</div>
+                <div class="passage-text">
+                    A favourite winter activity is skating. But before you go skating on a pond or lake, there are a few safety tips you should know. The ice should be at least 6 inches thick. Never skate alone. Never <strong>assume</strong> the ice is safe, and do not go out onto the ice after an animal or toy. Always be familiar with the area where you want to skate and be sure <strong>it</strong> is well-lit if you go skating at night. The safest place to go skating is on a skating rink. Some cities have outdoor skating rinks. And most cities have an indoor skating rink you can use for a small fee.
+                    When you go skating for the first time, make sure you wear warm socks, a warm hat, and lots of layers of clothing. Most rinks have hot drinks and snacks, but you can also bring your own snacks. Weekends are usually the busiest time of the week to go skating. Weekday nights are usually less crowded. Evening skating can be a lot of fun for the whole family. Most rinks have floodlights. At night, the rink is lit up and bright.
+                </div>
+                <button class="toggle-trans-btn" onclick="toggleTranslation(this)">Mở dịch đoạn này 🌟</button>
+                <div class="translation-box">
+                    Một hoạt động mùa đông yêu thích là trượt băng. Nhưng trước khi bạn đi trượt băng trên ao hoặc hồ, có một vài mẹo an toàn bạn nên biết. Băng phải dày ít nhất 6 inch. Không bao giờ trượt băng một mình. Không bao giờ tự phụ/cho rằng băng là an toàn, và không đi ra ngoài băng đuổi theo một con vật hoặc đồ chơi. Luôn quen thuộc với khu vực bạn muốn trượt và chắc chắn rằng nó được chiếu sáng tốt nếu bạn trượt băng vào ban đêm. Nơi an toàn nhất để trượt băng là sân băng. Một số thành phố có sân trượt băng ngoài trời và hầu hết có sân trượt băng trong nhà có thu phí nhỏ...
+                </div>
+            </div>
+
+            <!-- EXERCISE 19 - PASSAGE 2 -->
+            <div class="card">
+                <div class="card-title">Exercise 19 - Text ❷</div>
+                <div class="passage-text">
+                    One of the most obvious negative aspects of social networking is losing face- to-face contact with other people. Teens are sitting around with their phone in their hands all day long, <strong>tapping</strong> messages onto screens instead of communicating with real people. Many teenagers feel more comfortable with virtual friends than with real ones. The majority think that it is easier to chat on the Internet because <strong>they</strong> lack communication skills.
+                    It is also true that parents often have no knowledge about what their kids do with their phones or computers. Crosby says that, "While kids are plugged into social media, only about 40% of parents are involved themselves." And because parents don't know the full picture, they also don't know how to deal with a teenager's potential overuse of social media and might not even be aware that a problem exists.
+                </div>
+                <button class="toggle-trans-btn" onclick="toggleTranslation(this)">Mở dịch đoạn này 🌟</button>
+                <div class="translation-box">
+                    Một trong những khía cạnh tiêu cực rõ ràng nhất của mạng xã hội là mất liên lạc trực tiếp với người khác. Các thanh thiếu niên đang ngồi một chỗ với chiếc điện thoại trên tay cả ngày dài, gõ tin nhắn lên màn hình thay vì giao tiếp với những người thực tế. Nhiều bạn trẻ cảm thấy thoải mái với những người bạn ảo hơn là bạn ngoài đời... Cha mẹ cũng thường không có kiến thức về những gì con cái làm với máy tính điện thoại...
+                </div>
+            </div>
+
+            <!-- EXERCISE 20 PASSAGE -->
+            <div class="card">
+                <div class="card-title">Exercise 20 - Text</div>
+                <div class="passage-text">
+                    My name is Peter. I have two hobbies. Firstly, I love playing volleyball. I want to be a famous volleyball player in the world. Now, I am a member of the school volleyball club. Playing volleyball is a great way to stay healthy and keep fit. I feel so excited when playing volleyball. I spend more than one hour each day playing with my friends or my cousins. Reading books is another favourite activity in my free time. I am interested in reading comics and science books. I often discuss the things I learn from books with my father. It is very helpful.
+                </div>
+                <button class="toggle-trans-btn" onclick="toggleTranslation(this)">Mở dịch đoạn này 🌟</button>
+                <div class="translation-box">
+                    Tên tôi là Peter. Tôi có hai sở thích. Thứ nhất, tôi thích chơi bóng chuyền. Tôi muốn trở thành một cầu thủ bóng chuyền nổi tiếng trên thế giới. Hiện tại, tôi là thành viên của câu lạc bộ bóng chuyền trường. Chơi bóng chuyền là một cách tuyệt vời để giữ sức khỏe và vóc dáng khỏe khoắn. Tôi cảm thấy rất hào hứng khi chơi bóng chuyền. Tôi dành hơn một giờ mỗi ngày để chơi cùng bạn bè hoặc anh em họ của mình. Đọc sách là một hoạt động yêu thích khác trong thời gian rảnh rỗi. Tôi quan tâm đến việc đọc truyện tranh và sách khoa học. Tôi thường thảo luận những điều mình học được từ sách với bố tôi. Nó rất hữu ích.
+                </div>
+            </div>
+
+        </div>
+
+        <!-- BÊN PHẢI: EXERCISES & QUESTION CARDS -->
+        <div class="split-pane right-pane" id="questions-container">
+            <!-- Questions dynamically generated here -->
+        </div>
+    </div>
+
+    <div class="submit-container">
+        <button class="btn-submit-all" onclick="finishQuiz()">🎉 NỘP BÀI KIỂM TRA 🎉</button>
+    </div>
+
+    <!-- SCORE BOARD MODAL -->
+    <div class="modal" id="score-modal">
+        <div class="modal-content">
+            <h2>📊 KẾT QUẢ CỦA BẠN 📊</h2>
+            <div class="score-num" id="modal-score">0 / 0</div>
+            <div class="feedback-text" id="modal-feedback">Cố lên nhé!</div>
+            <button class="close-modal-btn" onclick="closeModal()">Làm lại bài thi 🔁</button>
+        </div>
+    </div>
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <script>
+        // TRÍCH XUẤT TOÀN BỘ DỮ LIỆU ĐỀ BÀI CHÍNH XÁC
+        const quizData = [
+            // Exercise 15
+            {
+                id: "ex15_1",
+                section: "Exercise 15: Notice & Signs",
+                question: "1. What does the sign say?",
+                options: ["Dangerous dip", "Slippery road", "Quayside or riverbank ahead", "Compulsory ahead only"],
+                answer: "Quayside or riverbank ahead",
+                explanation: "<b>Giải thích chi tiết:</b><br>1. Phân tích nghĩa từ vựng:<br>- Dangerous dip: Chỗ lún nguy hiểm.<br>- Slippery road: Đường trơn trượt.<br>- Quayside or riverbank ahead: Bến cảng hoặc bờ sông phía trước.<br>- Compulsory ahead only: Chỉ được đi thẳng.<br>2. <b>Tại sao chọn C?</b> Biển báo giao thông báo hiệu phía trước có bờ sông hoặc bến tàu (Quayside/riverbank) nhằm cảnh báo phương tiện đề phòng rơi xuống nước."
+            },
+            {
+                id: "ex15_2",
+                section: "Exercise 15: Notice & Signs",
+                question: "2. What does the notice say?",
+                options: ["The front seats are only for children.", "Children are not allowed to sit here.", "Adult have to sit at the front.", "There is no more seat for adults."],
+                answer: "The front seats are only for children.",
+                explanation: "<b>Giải thích chi tiết:</b><br>Dựa trên bảng thông báo mẫu: 'FRONT SEATS RESERVED ONLY FOR CHILDREN' (Các ghế phía trước chỉ dành riêng cho trẻ em). Do đó phương án A hoàn toàn chính xác."
+            },
+            {
+                id: "ex15_3",
+                section: "Exercise 15: Notice & Signs",
+                question: "3. What does the sign say?",
+                options: ["The trip has run out of tickets.", "The secretary can book tickets after Friday.", "This school trip starts on Friday.", "The school trip has sold most of the tickets."],
+                answer: "The trip has run out of tickets.",
+                explanation: "<b>Giải thích chi tiết:</b><br>'Tickets completely sold out' đồng nghĩa với cụm từ 'run out of tickets' (hết vé sạch bách rồi)."
+            },
+            {
+                id: "ex15_4",
+                section: "Exercise 15: Notice & Signs",
+                question: "4. What does the notice say?",
+                options: ["Leave pet waste as it is.", "Clean up any waste your pet leaves behind.", "Cleaning up pet waste is optional.", "Only some pet waste needs to be cleaned."],
+                answer: "Clean up any waste your pet leaves behind.",
+                explanation: "<b>Giải thích chi tiết:</b><br>'Please clean up any waste your pet leaves behind' mang ý nghĩa nhắc nhở chủ thú nuôi dọn dẹp phân/rác thải của thú cưng, trùng khớp với đáp án B."
+            },
+            {
+                id: "ex15_5",
+                section: "Exercise 15: Notice & Signs",
+                question: "5. What does the sign say?",
+                options: ["You need to have the correct money when you board the bus.", "You need to keep your ticket ready for checking.", "Tickets must be bought before boarding the bus.", "You should not bring too much money on the bus."],
+                answer: "Tickets must be bought before boarding the bus.",
+                explanation: "<b>Giải thích chi tiết:</b><br>'Tickets must be bought before boarding' -> Phải mua vé trước khi lên xe buýt. Đáp án C diễn đạt chuẩn xác nhất."
+            },
+
+            // Exercise 16 - 1
+            {
+                id: "ex16_1_1",
+                section: "Exercise 16: Text ❶ (Model-Making)",
+                question: "1. Choose the best option for blank (1):",
+                options: ["Made", "making", "to make", "make"],
+                answer: "making",
+                explanation: "<b>Giải thích chi tiết:</b><br>Cấu trúc ngữ pháp phổ thông: Sau động từ yêu thích <b>Like + V-ing</b> chỉ sở thích lâu dài. Do đó chọn 'making'."
+            },
+            {
+                id: "ex16_1_2",
+                section: "Exercise 16: Text ❶ (Model-Making)",
+                question: "2. Choose the best option for blank (2):",
+                options: ["Any", "some", "a lot of", "few"],
+                answer: "Any",
+                explanation: "<b>Giải thích chi tiết:</b><br>Câu văn chứa từ 'don't need' là thể phủ định. Trong câu phủ định, ta dùng đại từ từ hạn định <b>Any</b> (bất kỳ kinh nghiệm nào)."
+            },
+            {
+                id: "ex16_1_3",
+                section: "Exercise 16: Text ❶ (Model-Making)",
+                question: "3. Choose the best option for blank (3):",
+                options: ["Created", "creativity", "create", "creative"],
+                answer: "creativity",
+                explanation: "<b>Giải thích chi tiết:</b><br>Sau tính từ sở hữu 'your' ta bắt buộc cần một danh từ (Noun).<br>- creativity (n): sự sáng tạo.<br>- creative (adj): mang tính sáng tạo."
+            },
+            {
+                id: "ex16_1_4",
+                section: "Exercise 16: Text ❶ (Model-Making)",
+                question: "4. Choose the best option for blank (4):",
+                options: ["Of", "To", "At", "For"],
+                answer: "At",
+                explanation: "<b>Giải thích chi tiết:</b><br>Cụm từ cố định chỉ thời gian: <b>At the end</b> (Vào lúc cuối, kết thúc)."
+            },
+
+            // Exercise 16 - 2
+            {
+                id: "ex16_2_1",
+                section: "Exercise 16: Text ❷ (Leisure Time)",
+                question: "1. Choose the best option for blank (1):",
+                options: ["Because", "but", "and", "so"],
+                answer: "Because",
+                explanation: "<b>Giải thích chi tiết:</b><br>Vế sau diễn đạt nguyên nhân bổ nghĩa cho vế trước: 'Thời gian rảnh rỗi rất quan trọng <b>vì (because)</b> nó giúp chúng ta nghỉ ngơi'."
+            },
+            {
+                id: "ex16_2_2",
+                section: "Exercise 16: Text ❷ (Leisure Time)",
+                question: "2. Choose the best option for blank (2):",
+                options: ["In", "to", "for", "on"],
+                answer: "for",
+                explanation: "<b>Giải thích chi tiết:</b><br>Cụm từ phối hợp từ vựng quen thuộc: <b>go for a walk</b> có nghĩa là đi dạo mát."
+            },
+            {
+                id: "ex16_2_3",
+                section: "Exercise 16: Text ❷ (Leisure Time)",
+                question: "3. Choose the best option for blank (3):",
+                options: ["Healthy", "unhealthily", "health", "unhealthy"],
+                answer: "Healthy",
+                explanation: "<b>Giải thích chi tiết:</b><br>Cấu trúc: <b>Stay + Tính từ (Adjective)</b> mang nghĩa giữ cho trạng thái như thế nào đó. Ở đây mang nghĩa tích cực nên ta chọn 'healthy' (khoẻ mạnh)."
+            },
+            {
+                id: "ex16_2_4",
+                section: "Exercise 16: Text ❷ (Leisure Time)",
+                question: "4. Choose the best option for blank (4):",
+                options: ["Sports", "puzzles", "hobbies", "messages"],
+                answer: "hobbies",
+                explanation: "<b>Giải thích chi tiết:</b><br>'Share your hobbies with us' - Hãy chia sẻ các sở thích của bạn với chúng tôi. Các từ khác không phù hợp ngữ cảnh tổng thể bài đọc nói về Leisure time."
+            },
+
+            // Exercise 17 - 1
+            {
+                id: "ex17_1_1",
+                section: "Exercise 17: Text ❶ (Reading Books)",
+                question: "1. Choose the best option for blank (1):",
+                options: ["Well", "best", "better", "gooder"],
+                answer: "best",
+                explanation: "<b>Giải thích chi tiết:</b><br>Có cấu trúc mạo từ danh định 'one of the + so sánh nhất'. Do vậy ta sử dụng tính từ so sánh cực đại 'best'."
+            },
+            {
+                id: "ex17_1_2",
+                section: "Exercise 17: Text ❶ (Reading Books)",
+                question: "2. Choose the best option for blank (2):",
+                options: ["Read", "reads", "reading", "to reading"],
+                answer: "reading",
+                explanation: "<b>Giải thích chi tiết:</b><br>Tương tự như trên, động từ <b>Like + V-ing</b> (reading) được ưa chuộng hơn trong văn cảnh diễn đạt sở thích cá nhân."
+            },
+            {
+                id: "ex17_1_3",
+                section: "Exercise 17: Text ❶ (Reading Books)",
+                question: "3. Choose the best option for blank (3):",
+                options: ["At", "in", "with", "of"],
+                answer: "with",
+                explanation: "<b>Giải thích chi tiết:</b><br>Cấu trúc bất biến: <b>Provide somebody WITH something</b> (Cung cấp cho ai cái gì)."
+            },
+            {
+                id: "ex17_1_4",
+                section: "Exercise 17: Text ❶ (Reading Books)",
+                question: "4. Choose the best option for blank (4):",
+                options: ["to relax", "relax", "relaxing", "relaxed"],
+                answer: "to relax",
+                explanation: "<b>Giải thích chi tiết:</b><br>Cấu trúc chỉ mục đích hành động: <b>a way for somebody TO do something</b> (Cách để ai đó làm việc gì)."
+            },
+            {
+                id: "ex17_1_5",
+                section: "Exercise 17: Text ❶ (Reading Books)",
+                question: "5. Choose the best option for blank (5):",
+                options: ["Where", "why", "who", "that"],
+                answer: "that",
+                explanation: "<b>Giải thích chi tiết:</b><br>Sử dụng đại từ quan hệ <b>That</b> để thay thế cho danh từ chỉ vật thể/sự việc đứng liền trước nó ('knowledge and skills')."
+            },
+            {
+                id: "ex17_1_6",
+                section: "Exercise 17: Text ❶ (Reading Books)",
+                question: "6. Choose the best option for blank (6):",
+                options: ["Good", "well", "goods", "better"],
+                answer: "well",
+                explanation: "<b>Giải thích chi tiết:</b><br>Động từ 'behave' (cư xử) là động từ thường, cần một trạng từ (Adverb) đi kèm bổ nghĩa -> Chọn <b>well</b>."
+            },
+
+            // Exercise 17 - 2
+            {
+                id: "ex17_2_1",
+                section: "Exercise 17: Text ❷ (Quang's Garden)",
+                question: "1. Choose the best option for blank (1):",
+                options: ["Spends", "takes", "does", "looks"],
+                answer: "Spends",
+                explanation: "<b>Giải thích chi tiết:</b><br>Cấu trúc quản lý quỹ thời gian: <b>S + spend + time + V-ing</b> (Dành thời gian làm gì)."
+            },
+            {
+                id: "ex17_2_2",
+                section: "Exercise 17: Text ❷ (Quang's Garden)",
+                question: "2. Choose the best option for blank (2):",
+                options: ["Real", "virtual", "different", "true"],
+                answer: "virtual",
+                explanation: "<b>Giải thích chi tiết:</b><br>Vế sau đề bài hé lộ 'gaming friends' và ngồi trước máy tính suốt ngày -> Chứng tỏ khu vườn này nằm trong trò chơi máy tính, gọi là một <b>virtual garden</b> (khu vườn ảo)."
+            },
+            {
+                id: "ex17_2_3",
+                section: "Exercise 17: Text ❷ (Quang's Garden)",
+                question: "3. Choose the best option for blank (3):",
+                options: ["At", "with", "on", "with"],
+                answer: "on",
+                explanation: "<b>Giải thích chi tiết:</b><br>Cụm từ danh từ đi với giới từ cố định: <b>Have harmful effects ON somebody/something</b> (Gây ảnh hưởng xấu lên ai/cái gì)."
+            },
+            {
+                id: "ex17_2_4",
+                section: "Exercise 17: Text ❷ (Quang's Garden)",
+                question: "4. Choose the best option for blank (4):",
+                options: ["Watching", "watch", "to watching", "watched"],
+                answer: "Watching",
+                explanation: "<b>Giải thích chi tiết:</b><br>Cấu trúc so sánh lựa chọn: <b>Prefer V1-ing TO V2-ing</b> (Thích làm việc 1 hơn làm việc 2)."
+            },
+            {
+                id: "ex17_2_5",
+                section: "Exercise 17: Text ❷ (Quang's Garden)",
+                question: "5. Choose the best option for blank (5):",
+                options: ["Much", "little", "many", "a few"],
+                answer: "many",
+                explanation: "<b>Giải thích chi tiết:</b><br>'Plants' là một danh từ đếm được số nhiều (có đuôi s). Do đó ta dùng từ hạn định số lượng <b>many</b>."
+            },
+            {
+                id: "ex17_2_6",
+                section: "Exercise 17: Text ❷ (Quang's Garden)",
+                question: "6. Choose the best option for blank (6):",
+                options: ["Happy", "cheerful", "physical", "worried"],
+                answer: "worried",
+                explanation: "<b>Giải thích chi tiết:</b><br>Bố mẹ Quang thấy con mình ôm máy tính cả ngày và đang tính cấm chơi -> Trạng thái tâm lý của họ phải là <b>worried</b> (lo lắng, muộn phiền)."
+            },
+
+            // Exercise 19 - 1
+            {
+                id: "ex19_1_1",
+                section: "Exercise 19: Text ❶ (Skating Safety)",
+                question: "1. What can be the best title for the passage?",
+                options: ["Winter Fun", "Skating Safety Tips", "Best Skating Rinks", "How to Knit a Scarf"],
+                answer: "Skating Safety Tips",
+                explanation: "<b>Giải thích chi tiết:</b><br>Ngay từ câu thứ hai của bài đọc, tác giả chỉ rõ: 'there are a few safety tips you should know' (có vài mẹo an toàn bạn nên nắm rõ)."
+            },
+            {
+                id: "ex19_1_2",
+                section: "Exercise 19: Text ❶ (Skating Safety)",
+                question: "2. The word 'assume' in line 2 is closest in meaning to __________.",
+                options: ["Believe", "doubt", "ignore", "confirm"],
+                answer: "Believe",
+                explanation: "<b>Giải thích chi tiết:</b><br>'Assume' nghĩa là mặc định thừa nhận, tự cho là, tin rằng điều gì đó là đúng mà không kiểm chứng -> Đồng nghĩa tốt nhất với <b>Believe</b>."
+            },
+            {
+                id: "ex19_1_3",
+                section: "Exercise 19: Text ❶ (Skating Safety)",
+                question: "3. The word 'it' in line 3 refers to _______.",
+                options: ["the area", "the ice", "the animal", "the toy"],
+                answer: "the area",
+                explanation: "<b>Giải thích chi tiết:</b><br>'Always be familiar with the area where you want to skate and be sure it is well-lit' -> Chữ 'it' ám chỉ chính vùng không gian sân trượt đó (the area)."
+            },
+            {
+                id: "ex19_1_4",
+                section: "Exercise 19: Text ❶ (Skating Safety)",
+                question: "4. Which of the following is NOT true according to the passage?",
+                options: ["You should never skate alone on a pond or lake.", "Weekends are typically the busiest times for skating rinks.", "It's recommended to wear warm clothing when you go skating for the first time.", "It is always safe to skate on a lake if the ice is thick enough."],
+                answer: "It is always safe to skate on a lake if the ice is thick enough.",
+                explanation: "<b>Giải thích chi tiết:</b><br>Bài viết dặn rõ: 'Never assume the ice is safe' (Không bao giờ được tự mặc định đá luôn an toàn). Vì vậy câu D phát biểu 'luôn luôn an toàn' là SAI."
+            },
+            {
+                id: "ex19_1_5",
+                section: "Exercise 19: Text ❶ (Skating Safety)",
+                question: "5. Which of the following can be inferred from the passage?",
+                options: ["Outdoor skating rinks are always safer than indoor rinks.", "It's possible to skate at night on well-lit rinks.", "All cities have free indoor skating rinks.", "You should never bring your own snacks to a skating rink."],
+                answer: "It's possible to skate at night on well-lit rinks.",
+                explanation: "<b>Giải thích chi tiết:</b><br>Đoạn văn viết: 'At night, the rink is lit up and bright' -> Có thể suy luận ra người ta trượt được ban đêm nhờ hệ thống đèn chiếu sáng cao áp."
+            },
+
+            // Exercise 19 - 2
+            {
+                id: "ex19_2_1",
+                section: "Exercise 19: Text ❷ (Social Networks)",
+                question: "1. What is the main idea of the passage?",
+                options: ["Social media helps teenagers improve their communication skills.", "Parents should use social media more often.", "Social networking can lead to less face-to-face contact and parental unawareness of its impact on teens.", "Teenagers prefer virtual friends over real friends."],
+                answer: "Social networking can lead to less face-to-face contact and parental unawareness of its impact on teens.",
+                explanation: "<b>Giải thích chi tiết:</b><br>Bài đọc tập trung nêu tác hại mất tương tác trực tiếp (losing face-to-face contact) và sự thờ ơ, thiếu kiểm soát từ phụ huynh đối với con cái."
+            },
+            {
+                id: "ex19_2_2",
+                section: "Exercise 19: Text ❷ (Social Networks)",
+                question: "2. What does the word 'tapping' in the passage mostly mean?",
+                options: ["Hitting", "typing", "drawing", "calling"],
+                answer: "typing",
+                explanation: "<b>Giải thích chi tiết:</b><br>'tapping messages onto screens' hành động gõ lạch cạch ngón tay tạo ký tự văn bản trên màn hình cảm ứng điện thoại, đồng nghĩa với <b>typing</b> (đánh máy/nhập liệu)."
+            },
+            {
+                id: "ex19_2_3",
+                section: "Exercise 19: Text ❷ (Social Networks)",
+                question: "3. The word 'they' in line 4 refers to _______.",
+                options: ["virtual friends", "real people", "many teenagers", "communication skills"],
+                answer: "many teenagers",
+                explanation: "<b>Giải thích chi tiết:</b><br>'Many teenagers feel... because they lack...' -> Chữ 'they' này đóng vai trò thay thế cho chủ từ số nhiều liền trước là <b>many teenagers</b>."
+            }
+        ];
+
+        // Web Audio API để sinh âm thanh độc lập không cần link ngoài
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (type === 'correct') {
+                // Tiếng Ding vui tai
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.4);
+            } else {
+                // Tiếng Tèo tèo tèo trầm buồn
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, audioCtx.currentTime); // A3
+                osc.frequency.linearRampToValueAtTime(110, audioCtx.currentTime + 0.3); // A2
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.4);
+            }
+        }
+
+        // Thuật toán đảo mảng ngẫu nhiên (Fisher-Yates) cho đáp án ABCD
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Hàm bật tắt bản dịch Việt ngữ
+        function toggleTranslation(btn) {
+            let box = btn.nextElementSibling;
+            if (box.style.display === "block") {
+                box.style.display = "none";
+                btn.innerText = "Mở dịch đoạn này 🌟";
+            } else {
+                box.style.display = "block";
+                btn.innerText = "Đóng bản dịch ❌";
+            }
+        }
+
+        // Điền dấu chấm lửng trực tiếp khi click ở pane trái
+        function revealBlank(element, correctWord) {
+            element.innerText = " " + correctWord + " ";
+            element.style.background = "#00D26A";
+            element.style.color = "white";
+            playSound('correct');
+        }
+
+        // Khởi tạo hiển thị toàn bộ danh sách câu hỏi trắc nghiệm bên phải
+        function renderQuestions() {
+            const container = document.getElementById('questions-container');
+            container.innerHTML = "";
+
+            let currentSection = "";
+
+            quizData.forEach((q, index) => {
+                if (currentSection !== q.section) {
+                    currentSection = q.section;
+                    let secHeader = document.createElement('h2');
+                    secHeader.style.margin = "20px 0 10px 0";
+                    secHeader.style.color = "white";
+                    secHeader.style.textShadow = "2px 2px 4px rgba(0,0,0,0.3)";
+                    secHeader.style.fontSize = "1.3rem";
+                    secHeader.innerText = currentSection;
+                    container.appendChild(secHeader);
+                }
+
+                let qBox = document.createElement('div');
+                qBox.className = "question-box";
+                qBox.id = `qbox_${q.id}`;
+
+                let qText = document.createElement('div');
+                qText.className = "question-text";
+                qText.innerText = q.question;
+                qBox.appendChild(qText);
+
+                let grid = document.createElement('div');
+                grid.className = "options-grid";
+
+                // Xáo trộn đáp án ngẫu nhiên
+                let shuffledOptions = shuffleArray([...q.options]);
+
+                shuffledOptions.forEach(opt => {
+                    let btn = document.createElement('button');
+                    btn.className = "option-btn";
+                    btn.innerText = opt;
+                    btn.onclick = function() { checkAnswer(this, q.id, opt, q.answer); };
+                    grid.appendChild(btn);
+                });
+
+                qBox.appendChild(grid);
+
+                // Hộp giải thích chi tiết ẩn sẵn
+                let exp = document.createElement('div');
+                exp.className = "explanation";
+                exp.id = `exp_${q.id}`;
+                exp.innerHTML = q.explanation;
+                qBox.appendChild(exp);
+
+                container.appendChild(qBox);
+            });
+        }
+
+        let userAnswers = {};
+
+        function checkAnswer(selectedBtn, qId, chosenOpt, correctOpt) {
+            // Nếu đã chọn câu này rồi thì không cho chọn lại để đảm bảo tính kỷ luật phòng thi
+            if (userAnswers[qId]) return;
+
+            userAnswers[qId] = chosenOpt;
+            let parentGrid = selectedBtn.parentElement;
+            let allButtons = parentGrid.querySelectorAll('.option-btn');
+
+            if (chosenOpt === correctOpt) {
+                selectedBtn.classList.add('correct');
+                playSound('correct');
+            } else {
+                selectedBtn.classList.add('wrong');
+                playSound('wrong');
+                // Tự động tìm hiển thị luôn màu xanh cho đáp án đúng ngay lập tức
+                allButtons.forEach(b => {
+                    if (b.innerText === correctOpt) {
+                        b.classList.add('correct');
+                    }
+                });
+            }
+
+            // Hiển thị phần bài học giải thích chi tiết của Master giáo viên
+            document.getElementById(`exp_${qId}`).style.display = "block";
+        }
+
+        // XỬ LÝ ĐỒNG HỒ ĐẾM NGƯỢC (TIMER)
+        let timerSeconds = 600; 
+        let timerInterval = null;
+        let isTimerRunning = false;
+
+        function toggleTimer() {
+            const btn = document.getElementById('timer-toggle-btn');
+            if (!isTimerRunning) {
+                isTimerRunning = true;
+                btn.innerText = "TẠM DỪNG ⏸️";
+                timerInterval = setInterval(() => {
+                    if (timerSeconds <= 0) {
+                        clearInterval(timerInterval);
+                        alert("Đã hết giờ làm bài. Bạn vẫn có thể tiếp tục làm, nhưng nhớ là trong phòng thi thật, bạn chỉ nên làm một bài như thế này trong 10 phút thôi nha.");
+                        document.getElementById('timer-display').innerText = "00:00";
+                    } else {
+                        timerSeconds--;
+                        let mins = Math.floor(timerSeconds / 60);
+                        let secs = timerSeconds % 60;
+                        document.getElementById('timer-display').innerText = 
+                            `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                    }
+                }, 1000);
+            } else {
+                isTimerRunning = false;
+                btn.innerText = "TIẾP TỤC ▶️";
+                clearInterval(timerInterval);
+            }
+        }
+
+        // TỔNG KẾT ĐIỂM SỐ XỊN XÒ & PHÁO HOA
+        function finishQuiz() {
+            let correctCount = 0;
+            quizData.forEach(q => {
+                if (userAnswers[q.id] === q.answer) {
+                    correctCount++;
+                }
+            });
+
+            const scoreModal = document.getElementById('score-modal');
+            const scoreDisplay = document.getElementById('modal-score');
+            const feedbackDisplay = document.getElementById('modal-feedback');
+
+            scoreDisplay.innerText = `${correctCount} / ${quizData.length}`;
+
+            // Tạo lời nhận xét thông minh cá nhân hóa của cô Lê Hằng
+            let ratio = correctCount / quizData.length;
+            if (ratio === 1) {
+                feedbackDisplay.innerText = "👑 THIÊN TÀI TIẾNG ANH XUẤT SẮC! Con đạt điểm tuyệt đối rồi, cô tự hào về con lắm! 🎉";
+                startConfetti();
+            } else if (ratio >= 0.7) {
+                feedbackDisplay.innerText = "🌟 LÀM TỐT LẮM! Con học bài rất kỹ và rất thông minh. Phát huy con nhé!";
+                startConfetti();
+            } else if (ratio >= 0.4) {
+                feedbackDisplay.innerText = "⚡ CỐ GẮNG LÊN CHÚT NỮA! Đọc kỹ phần giải thích chi tiết của cô để lần sau làm tốt hơn nha.";
+            } else {
+                feedbackDisplay.innerText = "💪 CỐ LÊN NHÉ! Đừng nản chí, hãy xem lại bản dịch và làm lại bài thi một lần nữa cùng cô nha con.";
+            }
+
+            scoreModal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('score-modal').classList.remove('active');
+            // Reset toàn bộ bài thi để học sinh luyện tập lại nhiều lần
+            userAnswers = {};
+            timerSeconds = 600;
+            renderQuestions();
+        }
+
+        // Hiệu ứng hạt pháo giấy Confetti mừng chiến thắng dùng Canvas
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let confettiPieces = [];
+
+        function startConfetti() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            confettiPieces = [];
+            for (let i = 0; i < 150; i++) {
+                confettiPieces.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    r: Math.random() * 6 + 4,
+                    d: Math.random() * canvas.height,
+                    color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+                    tilt: Math.random() * 10 - 5
+                });
+            }
+            requestAnimationFrame(drawConfetti);
+        }
+
+        function drawConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let alive = false;
+            confettiPieces.forEach(p => {
+                ctx.beginPath();
+                ctx.lineWidth = p.r;
+                ctx.strokeStyle = p.color;
+                ctx.moveTo(p.x + p.tilt + p.r / 2, p.y);
+                ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
+                ctx.stroke();
+
+                p.y += Math.cos(p.d) + 1 + p.r / 2;
+                p.x += Math.sin(p.d);
+                
+                if (p.y < canvas.height) {
+                    alive = true;
+                }
+            });
+            if (alive) {
+                requestAnimationFrame(drawConfetti);
+            }
+        }
+
+        // Tự động chạy khi mở trang web
+        window.onload = function() {
+            renderQuestions();
+        };
+    </script>
+</body>
+</html>
